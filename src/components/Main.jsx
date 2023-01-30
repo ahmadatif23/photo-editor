@@ -118,9 +118,9 @@ const Main = () => {
     const saveImage = () => {}
 
     return (
-        <div className="container mx-auto flex py-14 h-screen">
-            <div className="w-1/3 h-full">
-                <div className="w-4/5 h-full flex flex-col">
+        <div className="container mx-auto flex lg:flex-row flex-col-reverse lg:py-14 lg:px-0 p-4 h-screen">
+            <div className="lg:w-1/3 lg:h-full h-1/2">
+                <div className="lg:w-4/5 h-full flex flex-col">
                     <div className="flex flex-col gap-4">
                         <button disabled={ !image } onClick={ handleRotate } className="border rounded-xl px-6 py-4 flex bg-white disabled:bg-gray-50 shadow">
                             <p className="text-sm text-gray-600">Rotate Image</p>
@@ -152,7 +152,7 @@ const Main = () => {
                             <p className="text-[10px] text-gray-300">Original Image Size</p>
                             <p className={ compressedImage ? 'text-sm line-through font-semibold text-gray-300' : 'text-sm font-semibold text-gray-300' }>{ convertSize(originalImage.size) }</p>
                         </div>
-                        <div className="mt-10 w-full">
+                        <div className="lg:mt-10 mt-4 w-full">
                             <label htmlFor="uploadImage" className="w-full flex justify-center items-center cursor-pointer bg-slate-800 p-4 rounded-full text-white">Upload Image</label>
                         </div>
                         {/* <div className="mt-10 w-full">
@@ -162,8 +162,8 @@ const Main = () => {
                 </div>
             </div>
 
-            <div className="w-2/3">
-                <div className="w-full max-w-[90vh] h-full border rounded-xl overflow-hidden p-10 flex items-center justify-center">
+            <div className="lg:w-2/3 lg:h-full h-1/2 lg:mb-0 mb-10">
+                <div className="w-full lg:max-w-[90vh] h-full max-h-[92vw] border rounded-xl overflow-hidden lg:p-10 p-4 flex items-center justify-center">
                     <div className='w-full h-full'>
                         <div id='image_container' className='w-full h-full flex items-center justify-center'>
                             { 
@@ -180,7 +180,7 @@ const Main = () => {
 
                             <div id='image_wrapper' className='relative'>
                                 { (image && !compressedImageLink) && <img style={{ transform: `rotate(${ rotate }deg)`, maxHeight: `${ container.height }px` }} onLoad={ e => setDetails(e.currentTarget) } src={ image } alt="" className='object-contain'/> }
-                                { compressedImageLink && <img style={{ transform: `rotate(${ rotate }deg)` }} onLoad={ e => setDetails(e.currentTarget) } src={ compressedImageLink } alt="" className='object-contain'/>}
+                                { compressedImageLink && <img style={{ transform: `rotate(${ rotate }deg)`, maxHeight: `${ container.height }px` }} onLoad={ e => setDetails(e.currentTarget) } src={ compressedImageLink } alt="" className='object-contain'/>}
 
                                 { (watermark && isWatermark) && <div className='absolute bottom-1/2 right-1/2 transform translate-x-1/2 translate-y-1/2'>
                                     <div style={{ height: `${ wrapper.height }px`, width: `${ wrapper.width }px` }} className='flex bg-gradient-to-b from-transparent to-[#000000a6] p-2'>
