@@ -133,7 +133,7 @@ const Main = () => {
                             {
                                 isWatermark &&
                                 <div className='border rounded-xl px-6 py-4 flex bg-white disabled:bg-gray-50 shadow'>
-                                    <input onInput={ handleWatermark } type="text" value={watermark} placeholder='Please type your watermark' className='placeholder:text-xs border-b focus-within:outline-none text-sm text-gray-600 p-0.5 w-full'/>
+                                    <input autoFocus onInput={ handleWatermark } type="text" value={watermark} placeholder='Please type your watermark' className='placeholder:text-xs border-b focus-within:outline-none text-sm text-gray-600 p-0.5 w-full'/>
                                 </div>
                             }
                         </div>
