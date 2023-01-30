@@ -144,13 +144,13 @@ const Main = () => {
                     </div>
 
                     <div className="mt-auto">
-                        <div className="flex justify-between items-center">
+                        <div className={ 'justify-between items-center ' + (!compressedImage ? 'hidden' : 'flex') }>
                             <p className="text-xs text-gray-400">Optimised Image Size</p>
                             <p className="text-lg font-medium text-gray-600">{ convertSize(compressedImage.size) }</p>
                         </div>
-                        <div className="flex justify-between items-center mt-1">
+                        <div className={ 'justify-between items-center mt-1 '+ (!image ? 'hidden' : 'flex') }>
                             <p className="text-[10px] text-gray-300">Original Image Size</p>
-                            <p className={ compressedImage ? 'text-sm line-through font-semibold text-gray-300' : 'text-sm font-semibold text-gray-300' }>{ convertSize(originalImage.size) }</p>
+                            <p className={ 'text-sm font-semibold text-gray-300 ' + (compressedImage ? 'line-through' : '') }>{ convertSize(originalImage.size) }</p>
                         </div>
                         <div className="lg:mt-10 mt-4 w-full">
                             <label htmlFor="uploadImage" className="w-full flex justify-center items-center cursor-pointer bg-slate-800 p-4 rounded-full text-white">Upload Image</label>
@@ -183,7 +183,7 @@ const Main = () => {
                                 { compressedImageLink && <img style={{ transform: `rotate(${ rotate }deg)`, maxHeight: `${ container.height }px` }} onLoad={ e => setDetails(e.currentTarget) } src={ compressedImageLink } alt="" className='object-contain'/>}
 
                                 { (watermark && isWatermark) && <div className='absolute bottom-1/2 right-1/2 transform translate-x-1/2 translate-y-1/2'>
-                                    <div style={{ height: `${ wrapper.height }px`, width: `${ wrapper.width }px` }} className='flex bg-gradient-to-b from-transparent to-[#000000a6] p-2'>
+                                    <div style={{ height: `${ wrapper.height }px`, width: `${ wrapper.width }px`, background: 'linear-gradient(0deg, rgba(0,0,0,0.70) 0%, rgba(255,255,255,0) 25%)' }} className='flex p-2'>
                                         <div className='text-white py-1 px-2 mt-auto'>{ watermark }</div>
                                     </div>
                                 </div> }
