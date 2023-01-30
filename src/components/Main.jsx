@@ -169,7 +169,7 @@ const Main = () => {
             </div>
 
             <div className="lg:w-2/3 lg:h-full h-1/2 lg:mb-0 mb-10">
-                <div className="w-full relative lg:max-w-[90vh] h-full max-h-[92vw] border rounded-xl overflow-hidden lg:p-10 p-4 flex items-center justify-center bgImage">
+                <div className={ 'w-full relative lg:max-w-[90vh] h-full max-h-[92vw] rounded-xl overflow-hidden lg:p-10 p-4 flex items-center justify-center ' + (image ? '' : 'border') }>
                     <div className='absolute w-full h-full' style={{ backgroundImage: `url(${ image })`, filter: 'blur(1000px)', backgroundPosition: 'center',  backgroundRepeat: 'no-repeat', backgroundSize: 'cover' }}></div>
                     <div className='w-full h-full relative z-10'>
                         <div id='image_container' className='w-full h-full flex items-center justify-center'>
