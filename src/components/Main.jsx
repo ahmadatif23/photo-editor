@@ -116,8 +116,20 @@ const Main = () => {
     }
 
     const handleReset = () => {
+        if (compressedImage) {
+            setCompressedImageLink('')
+            setCompressedImage('')
+        } else {
+            setCompressedImageLink('')
+            setCompressedImage('')
+            setImage('')
+        }
+    }
+
+    const handleRemove = () => {
         setCompressedImageLink('')
         setCompressedImage('')
+        setImage('')
     }
 
     const saveImage = () => {}
@@ -185,7 +197,7 @@ const Main = () => {
                                 </label>
                             }
 
-                            <div id='image_wrapper' className='relative'>
+                            <div id='image_wrapper' className='relative group'>
                                 { (image && !compressedImageLink) && <img style={{ transform: `rotate(${ rotate }deg)`, maxHeight: `${ container.height }px` }} onLoad={ e => setDetails(e.currentTarget) } src={ image } alt="" className='object-contain shadow'/> }
                                 { compressedImageLink && <img style={{ transform: `rotate(${ rotate }deg)`, maxHeight: `${ container.height }px` }} onLoad={ e => setDetails(e.currentTarget) } src={ compressedImageLink } alt="" className='object-contain shadow'/>}
 
