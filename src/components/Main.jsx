@@ -123,6 +123,7 @@ const Main = () => {
             setCompressedImageLink('')
             setCompressedImage('')
             setImage('')
+            document.getElementById('uploadImage').value = ''
         }
     }
 
