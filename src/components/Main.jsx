@@ -158,7 +158,7 @@ const Main = () => {
                             <p className={ 'text-sm font-semibold text-gray-300 ' + (compressedImage ? 'line-through' : '') }>{ convertSize(originalImage.size) }</p>
                         </div>
                         <div className="lg:mt-10 mt-4 w-full">
-                            <label htmlFor="uploadImage" className="w-full flex justify-center items-center cursor-pointer bg-slate-800 p-4 rounded-full text-white">Upload Image</label>
+                            <label htmlFor="uploadImage" className="w-full flex justify-center items-center cursor-pointer bg-orange-500 p-4 rounded-full text-white">Upload Image</label>
                         </div>
                         <button onClick={ handleReset } className='w-full mt-4 text-gray-400 hover:text-gray-500 transform hover:scale-[1.03] transition text-sm'>Reset</button>
                         {/* <div className="mt-10 w-full">
@@ -169,8 +169,9 @@ const Main = () => {
             </div>
 
             <div className="lg:w-2/3 lg:h-full h-1/2 lg:mb-0 mb-10">
-                <div className="w-full lg:max-w-[90vh] h-full max-h-[92vw] border rounded-xl overflow-hidden lg:p-10 p-4 flex items-center justify-center">
-                    <div className='w-full h-full'>
+                <div className="w-full relative lg:max-w-[90vh] h-full max-h-[92vw] border rounded-xl overflow-hidden lg:p-10 p-4 flex items-center justify-center bgImage">
+                    <div className='absolute w-full h-full' style={{ backgroundImage: `url(${ image })`, filter: 'blur(1000px)', backgroundPosition: 'center',  backgroundRepeat: 'no-repeat', backgroundSize: 'cover' }}></div>
+                    <div className='w-full h-full relative z-10'>
                         <div id='image_container' className='w-full h-full flex items-center justify-center'>
                             { 
                                 (!image && !compressedImageLink) &&
@@ -185,8 +186,8 @@ const Main = () => {
                             }
 
                             <div id='image_wrapper' className='relative'>
-                                { (image && !compressedImageLink) && <img style={{ transform: `rotate(${ rotate }deg)`, maxHeight: `${ container.height }px` }} onLoad={ e => setDetails(e.currentTarget) } src={ image } alt="" className='object-contain'/> }
-                                { compressedImageLink && <img style={{ transform: `rotate(${ rotate }deg)`, maxHeight: `${ container.height }px` }} onLoad={ e => setDetails(e.currentTarget) } src={ compressedImageLink } alt="" className='object-contain'/>}
+                                { (image && !compressedImageLink) && <img style={{ transform: `rotate(${ rotate }deg)`, maxHeight: `${ container.height }px` }} onLoad={ e => setDetails(e.currentTarget) } src={ image } alt="" className='object-contain shadow'/> }
+                                { compressedImageLink && <img style={{ transform: `rotate(${ rotate }deg)`, maxHeight: `${ container.height }px` }} onLoad={ e => setDetails(e.currentTarget) } src={ compressedImageLink } alt="" className='object-contain shadow'/>}
 
                                 { (watermark && isWatermark) && <div className='absolute bottom-1/2 right-1/2 transform translate-x-1/2 translate-y-1/2'>
                                     <div style={{ height: `${ wrapper.height }px`, width: `${ wrapper.width }px`, background: 'linear-gradient(0deg, rgba(0,0,0,0.70) 0%, rgba(255,255,255,0) 25%)' }} className='flex p-2'>
