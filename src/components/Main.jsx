@@ -119,9 +119,11 @@ const Main = () => {
         if (compressedImage) {
             setCompressedImageLink('')
             setCompressedImage('')
+            setIsWatermark(false)
         } else {
             setCompressedImageLink('')
             setCompressedImage('')
+            setIsWatermark(false)
             setImage('')
             document.getElementById('uploadImage').value = ''
         }
@@ -173,7 +175,7 @@ const Main = () => {
                         <div className="lg:mt-10 mt-4 w-full">
                             <label htmlFor="uploadImage" className="w-full flex justify-center items-center cursor-pointer bg-orange-500 p-4 rounded-full text-white">Upload Image</label>
                         </div>
-                        <button onClick={ handleReset } className='w-full mt-4 text-gray-400 hover:text-gray-500 transform hover:scale-[1.03] transition text-sm'>Reset</button>
+                        <button onClick={ handleReset } className='w-full mt-4 text-gray-400 hover:text-gray-500 transform hover:scale-[1.03] transition text-sm focus-visible:outline-none'>Reset</button>
                         {/* <div className="mt-10 w-full">
                             <button onClick={ saveImage } className="w-full bg-slate-800 p-4 rounded-full text-white">Download Image</button>
                         </div> */}
