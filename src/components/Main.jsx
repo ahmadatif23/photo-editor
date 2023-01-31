@@ -129,12 +129,6 @@ const Main = () => {
         }
     }
 
-    const handleRemove = () => {
-        setCompressedImageLink('')
-        setCompressedImage('')
-        setImage('')
-    }
-
     const saveImage = () => {}
 
     return (
@@ -201,8 +195,8 @@ const Main = () => {
                             }
 
                             <div id='image_wrapper' className='relative group'>
-                                { (image && !compressedImageLink) && <img style={{ transform: `rotate(${ rotate }deg)`, maxHeight: `${ container.height }px` }} onLoad={ e => setDetails(e.currentTarget) } src={ image } alt="" className='object-contain shadow'/> }
-                                { compressedImageLink && <img style={{ transform: `rotate(${ rotate }deg)`, maxHeight: `${ container.height }px` }} onLoad={ e => setDetails(e.currentTarget) } src={ compressedImageLink } alt="" className='object-contain shadow'/>}
+                                { (image && !compressedImageLink) && <img style={{ transform: `rotate(${ rotate }deg)`, maxHeight: `${ container.height }px` }} onLoad={ e => setDetails(e.currentTarget) } src={ image } alt="" className='object-contain shadow bg-white'/> }
+                                { compressedImageLink && <img style={{ transform: `rotate(${ rotate }deg)`, maxHeight: `${ container.height }px` }} onLoad={ e => setDetails(e.currentTarget) } src={ compressedImageLink } alt="" className='object-contain shadow bg-white'/>}
 
                                 { (watermark && isWatermark) && <div className='absolute bottom-1/2 right-1/2 transform translate-x-1/2 translate-y-1/2'>
                                     <div style={{ height: `${ wrapper.height }px`, width: `${ wrapper.width }px`, background: 'linear-gradient(0deg, rgba(0,0,0,0.70) 0%, rgba(255,255,255,0) 25%)' }} className='flex p-2'>
