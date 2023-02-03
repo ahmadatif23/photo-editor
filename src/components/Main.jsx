@@ -1,12 +1,8 @@
 import { useState } from 'react'
 import imageCompression from 'browser-image-compression'
 import { toBlob } from 'html-to-image';
-import { useEffect } from 'react'
 
 const Main = () => {
-    const imageWrapper = document.getElementById('image_wrapper')
-    // const imageContainer = document.getElementById('image_container')
-
     const [image, setImage] = useState('')
     // const [originalImage, setOriginalImage] = useState('')
     const [compressedImage, setCompressedImage] = useState('')
@@ -14,10 +10,6 @@ const Main = () => {
     const [watermark, setWatermark] = useState('')
     const [rotate, setRotate] = useState(0)
     const [isWatermark, setIsWatermark] = useState(false)
-    const [wrapper, setWrapper] = useState({
-        height: 0,
-        width: 0
-    })
     const [container, setContainer] = useState({
         height: 0,
         width: 0
@@ -30,28 +22,6 @@ const Main = () => {
         height: 0,
         width: 0
     })
-
-    useEffect(() => {
-        if (image || compressedImageLink) {
-            if  ((rotate / 90) % 2 === 0) {
-                setWrapper({
-                    height: imageWrapper.clientHeight,
-                    width: imageWrapper.clientWidth
-                })
-            } else {
-                setWrapper({
-                    height: imageWrapper.clientWidth,
-                    width: imageWrapper.clientHeight
-                })
-            }
-
-            toBlob(document.getElementById('image_wrapper'))
-                .then(function (blob) {
-                    // setOriginalImage(blob)
-                });
-        }
-
-    }, [image, imageSize, compressedImageLink, rotate, isWatermark, imageWrapper])
 
     // SET THE CONTAINER SIZE BEFORE ADDING THE IMAGE
     const handleClick = () => {
@@ -86,10 +56,6 @@ const Main = () => {
                             width: `${ container.width }px`
                         })
                         setImageSize({
-                            height: `${ (img.height / img.width) * container.width }px`,
-                            width: `${ container.width }px`
-                        })
-                        setWrapper({
                             height: `${ (img.height / img.width) * container.width }px`,
                             width: `${ container.width }px`
                         })
@@ -133,10 +99,6 @@ const Main = () => {
                     width: container.height
                 })
                 setImageSize({
-                    height: container.height,
-                    width: `${ container.height / (img.width / img.height) }px`
-                })
-                setWrapper({
                     height: container.height,
                     width: `${ container.height / (img.width / img.height) }px`
                 })
@@ -287,9 +249,6 @@ const Main = () => {
                             <label htmlFor="uploadImage" className="w-full flex justify-center items-center cursor-pointer bg-orange-500 p-4 rounded-full text-white">Upload Image</label>
                         </div>
                         <button onClick={ handleReset } className='w-full mt-4 text-gray-400 hover:text-gray-500 transform hover:scale-[1.03] transition text-sm focus-visible:outline-none'>Reset</button>
-                        {/* <div className="mt-10 w-full">
-                            <button onClick={ saveImage } className="w-full bg-slate-800 p-4 rounded-full text-white">Download Image</button>
-                        </div> */}
                     </div>
                 </div>
             </div>
@@ -329,18 +288,13 @@ const Main = () => {
                                 }
 
                                 { compressedImageLink && <img src={ compressedImageLink } alt="" className='object-contain shadow bg-white'/>}
-                                {/* { compressedImageLink && <img style={{ maxHeight: `${ container.height }px`, maxWidth: `${ container.height }px` }} src={ compressedImageLink } alt="" className='object-contain shadow bg-white'/>} */}
 
                                 { (watermark && isWatermark) && <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-10'>
-                                    {/* <div style={{ background: 'linear-gradient(0deg, rgba(0,0,0,0.70) 0%, rgba(255,255,255,0) 25%)' }} className='flex flex-col h-full w-full items-center justify-center p-2'> */}
                                     <div className='flex flex-col items-center justify-center p-2'>
                                         <div className='text-white font-bold uppercase text-xl opacity-60 tracking-widest'>WONG WEI</div>
                                         <div className='text-white font-bold uppercase text-xl opacity-60 tracking-widest'>0102233445</div>
                                         <div className='text-white font-bold uppercase text-xl opacity-60 tracking-widest'>NEXTSIX</div>
                                     </div>
-                                    {/* <div style={{ height: `${ wrapper.height }px`, width: `${ wrapper.width }px`, background: 'linear-gradient(0deg, rgba(0,0,0,0.70) 0%, rgba(255,255,255,0) 25%)' }} className='flex p-2'>
-                                        <div className='text-white py-1 px-2 mt-auto'>{ watermark }</div>
-                                    </div> */}
                                 </div> }
                             </div>
                         </div>
