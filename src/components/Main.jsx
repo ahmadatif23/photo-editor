@@ -213,7 +213,7 @@ const Main = () => {
         img.src = image
 
         const options = {
-            maxSizeMB: 0.5,
+            maxSizeMB: 0.3,
             maxWidthOrHeight: 1024,
             useWebWorker: true
         }
@@ -221,10 +221,44 @@ const Main = () => {
         img.onload = (e) => {
             const canvas = document.createElement('canvas')
             const ctx = canvas.getContext('2d')
-            canvas.width = img.width
-            canvas.height = img.height
+            const image = {
+                height: 0,
+                width: 0
+            }
 
-            ctx.drawImage(img, 0, 0)
+            if (img.width >= img.height) {
+                image.width = 1024
+                image.height = (img.height / img.width) * 1024
+
+                if ((rotate / 90) % 2 === 0) {
+                    canvas.width = 1024
+                    canvas.height = (img.height / img.width) * 1024
+                } else {
+                    canvas.width = (img.height / img.width) * 1024
+                    canvas.height = 1024
+                }
+            } else {
+                image.height = 1024
+                image.width = 1024 / (img.height / img.width)
+
+                if ((rotate / 90) % 2 === 0) {
+                    canvas.height = 1024
+                    canvas.width = 1024 / (img.height / img.width)
+                } else {
+                    canvas.height = 1024 / (img.height / img.width)
+                    canvas.width = 1024
+                }
+            }
+            console.log(image)
+
+            ctx.translate(canvas.width/2, canvas.height/2)
+            ctx.rotate(rotate * (Math.PI / 180))
+            ctx.drawImage(img, -image.width / 2, -image.height / 2, image.width, image.height)
+
+            // ctx.font = "36px Arial"
+            // ctx.fillStyle = "#FFF"
+            // ctx.textAlign = 'center'
+            // ctx.fillText (`<div>Tsst</div>`, canvas.width/2, canvas.height/2)
 
             canvas.toBlob((blob) => {
                 const tempImage = blob
@@ -299,7 +333,8 @@ const Main = () => {
                         <div className="lg:mt-10 mt-4 w-full">
                             <label htmlFor="uploadImage" className="w-full flex justify-center items-center cursor-pointer bg-orange-500 p-4 rounded-full text-white">Upload Image</label>
                         </div>
-                        <button onClick={ saveImage } className='w-full mt-4 text-gray-400 hover:text-gray-500 transform hover:scale-[1.03] transition text-sm focus-visible:outline-none'>Reset</button>
+                        <button onClick={ handleReset } className='w-full mt-4 text-gray-400 hover:text-gray-500 transform hover:scale-[1.03] transition text-sm focus-visible:outline-none'>Reset</button>
+                        <button onClick={ saveImage } className='w-full mt-4 text-red-500 hover:text-red-600 transform hover:scale-[1.03] transition text-sm focus-visible:outline-none'>Save</button>
                     </div>
                 </div>
             </div>
