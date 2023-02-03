@@ -4,7 +4,7 @@ import { toBlob } from 'html-to-image';
 
 const Main = () => {
     const [image, setImage] = useState('')
-    // const [originalImage, setOriginalImage] = useState('')
+    const [originalImage, setOriginalImage] = useState('')
     const [compressedImage, setCompressedImage] = useState('')
     const [compressedImageLink, setCompressedImageLink] = useState('')
     const [watermark, setWatermark] = useState('')
@@ -22,6 +22,9 @@ const Main = () => {
         height: 0,
         width: 0
     })
+
+    // SAVE IMAGE USING CANVAS
+    const [details, setDetails] = useState('')
 
     // SET THE CONTAINER SIZE BEFORE ADDING THE IMAGE
     const handleClick = () => {
@@ -41,7 +44,7 @@ const Main = () => {
             reader.onload = () => {
                 setImage(reader.result)
                 setIsWatermark(false)
-                // setOriginalImage(e.target.files[0])
+                setOriginalImage(e.target.files[0])
                 setCompressedImage('')
                 setCompressedImageLink('')
                 setRotate(0)
@@ -205,6 +208,54 @@ const Main = () => {
         }
     }
 
+    const saveImage = () => {
+        const img = new Image()
+        img.src = image
+
+        const options = {
+            maxSizeMB: 0.5,
+            maxWidthOrHeight: 1024,
+            useWebWorker: true
+        }
+
+        img.onload = (e) => {
+            const canvas = document.createElement('canvas')
+            const ctx = canvas.getContext('2d')
+            canvas.width = img.width
+            canvas.height = img.height
+
+            ctx.drawImage(img, 0, 0)
+
+            canvas.toBlob((blob) => {
+                const tempImage = blob
+
+                if (options.maxSizeMB >= tempImage/1024) {
+                    alert('Image is too small, cant be compressed')
+                    return 0
+                }
+        
+                imageCompression(tempImage, options).then((output) => {
+                    const downloadLink = URL.createObjectURL(output)
+
+                    var reader = new FileReader();
+                    reader.readAsDataURL(blob); 
+                    reader.onloadend = function() {
+                        // var base64data = reader.result;                
+                    }
+        
+                    setIsWatermark(false)
+                    setCompressedImage(output)
+                    setCompressedImageLink(downloadLink)
+                })
+            })
+
+            // const a = document.createElement('a')
+            // a.download = 'download.png'
+            // a.href = canvas.toDataURL('image/png')
+            // a.click()
+        }
+    }
+
     return (
         <div className="container mx-auto flex lg:flex-row flex-col-reverse lg:py-14 lg:px-0 p-4 h-screen">
             <div className="lg:w-1/3 lg:h-full h-1/2">
@@ -243,12 +294,12 @@ const Main = () => {
                         </div>
                         <div className={ 'justify-between items-center mt-1 '+ (!image ? 'hidden' : 'flex') }>
                             <p className="text-[10px] text-gray-300">Original Image Size</p>
-                            {/* <p className={ 'text-sm font-semibold text-gray-300 ' + (compressedImage ? 'line-through' : '') }>{ convertSize(originalImage.size) }</p> */}
+                            <p className={ 'text-sm font-semibold text-gray-300 ' + (compressedImage ? 'line-through' : '') }>{ convertSize(originalImage.size) }</p>
                         </div>
                         <div className="lg:mt-10 mt-4 w-full">
                             <label htmlFor="uploadImage" className="w-full flex justify-center items-center cursor-pointer bg-orange-500 p-4 rounded-full text-white">Upload Image</label>
                         </div>
-                        <button onClick={ handleReset } className='w-full mt-4 text-gray-400 hover:text-gray-500 transform hover:scale-[1.03] transition text-sm focus-visible:outline-none'>Reset</button>
+                        <button onClick={ saveImage } className='w-full mt-4 text-gray-400 hover:text-gray-500 transform hover:scale-[1.03] transition text-sm focus-visible:outline-none'>Reset</button>
                     </div>
                 </div>
             </div>
@@ -260,7 +311,7 @@ const Main = () => {
                         <div id='image_container' className='w-full h-full flex items-center justify-center relative'>
                             { 
                                 (!image && !compressedImageLink) &&
-                                <div className='absolute w-full h-full top-0 left-0'>
+                                <div className='absolute w-full h-full top-0 left-0 z-10'>
                                     <label className='w-full h-full cursor-pointer flex flex-col justify-center items-center border border-dashed rounded-xl' htmlFor="uploadImage">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-20 h-20 text-gray-400">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
@@ -271,7 +322,7 @@ const Main = () => {
                                 </div>
                             }
 
-                            <div id='image_wrapper' style={{ height: imageSize.height, width: imageSize.width }} className='relative'>
+                            <div id='image_wrapper' style={{ height: imageSize.height, width: imageSize.width }} className='relative z-0'>
                                 { (image && !compressedImageLink) &&
                                     <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>
                                         <img
@@ -283,6 +334,7 @@ const Main = () => {
                                             src={ image }
                                             alt='Uploaded'
                                             className='object-contain shadow bg-white'
+                                            onLoad={e => console.log(e.target.value)}
                                         />
                                     </div>
                                 }
