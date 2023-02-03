@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import imageCompression from 'browser-image-compression'
 import { toBlob } from 'html-to-image';
+import { useDropzone } from 'react-dropzone'
 
 const Main = () => {
     const [image, setImage] = useState('')
@@ -32,13 +33,22 @@ const Main = () => {
         }
     }
 
-    const handleImage = (e) => {
-        if (e.target.files.length !== 0) {
+    const {acceptedFiles, getRootProps, getInputProps} = useDropzone({
+        onDrop: files => {
+            console.log('start')
+            console.log('loading...')
+            const imageContainer = document.getElementById('image_container')
+            if (imageContainer) {
+                setContainer({
+                    height: imageContainer.clientHeight,
+                    width: imageContainer.clientWidth
+                })
+            }
             const reader = new FileReader()
 
             reader.onload = () => {
                 setImage(reader.result)
-                setOriginalImage(e.target.files[0])
+                setOriginalImage(files[0])
                 setCompressedImage('')
                 setCompressedImageLink('')
                 setRotate(0)
@@ -47,33 +57,33 @@ const Main = () => {
                 const img = new Image()
                 img.src = reader.result
                 img.onload = () => {
+                    console.log('completed')
                     if (img.width >= img.height) {
                         setMaxSize({
-                            height: `${ (img.height / img.width) * container.width }px`,
-                            width: `${ container.width }px`
+                            height: `${ (img.height / img.width) * imageContainer.clientWidth }px`,
+                            width: `${ imageContainer.clientWidth }px`
                         })
                         setImageSize({
-                            height: `${ (img.height / img.width) * container.width }px`,
-                            width: `${ container.width }px`
+                            height: `${ (img.height / img.width) * imageContainer.clientWidth }px`,
+                            width: `${ imageContainer.clientWidth }px`
                         })
                     } else {
                         setMaxSize({
-                            height: `${ container.height }px`,
-                            width: `${ container.height / (img.height / img.width) }px`
+                            height: `${ imageContainer.clientHeight }px`,
+                            width: `${ imageContainer.clientHeight / (img.height / img.width) }px`
                         })
                         setImageSize({
-                            height: `${ container.height }px`,
-                            width: `${ container.height / (img.height / img.width) }px`
+                            height: `${ imageContainer.clientHeight }px`,
+                            width: `${ imageContainer.clientHeight / (img.height / img.width) }px`
                         })
                     }
-                    
                 }
             }
 
-            reader.readAsDataURL(e.target.files[0])
+            reader.readAsDataURL(files[0])
         }
-    }
-
+    });
+  
     const handleRotate = (e, direction) => {
         e.preventDefault()
 
@@ -203,13 +213,13 @@ const Main = () => {
             ctx.translate(canvas.width/2, canvas.height/2)
             ctx.rotate(rotate * (Math.PI / 180))
             ctx.drawImage(img, -image.width / 2, -image.height / 2, image.width, image.height)
-
+            
             ctx.font = "600 30px Arial"
             ctx.fillStyle = "rgba(255, 255, 255, 0.65)"
             ctx.textAlign = 'center'
 
             ctx.rotate(-rotate * (Math.PI / 180))
-            ctx.fillText ('CHIN CHUN', 0, 30)
+            ctx.fillText ('JASON FORD', 0, 30)
             ctx.fillText ('0102345678', 0, 70)
 
             canvas.toBlob((blob) => {
@@ -248,13 +258,9 @@ const Main = () => {
                                 <p className="text-sm text-gray-600">Rotate Right</p>
                             </button>
                         </div>
-
-                        <button disabled={ !image || compressedImage } onClick={ saveImage } className="border rounded-xl px-6 py-4 flex bg-white disabled:bg-gray-50 shadow">
-                            <p className="text-sm text-gray-600">Compress Image</p>
-                        </button>
                     </div>
 
-                    <div className="mt-auto">
+                    <div className="mt-auto w-full">
                         <div className={ 'justify-between items-center ' + (!compressedImage ? 'hidden' : 'flex') }>
                             <p className="text-xs text-gray-400">Optimised Image Size</p>
                             <p className="text-lg font-medium text-gray-600">{ convertSize(compressedImage.size) }</p>
@@ -263,8 +269,11 @@ const Main = () => {
                             <p className="text-[10px] text-gray-300">Original Image Size</p>
                             <p className={ 'text-sm font-semibold text-gray-300 ' + (compressedImage ? 'line-through' : '') }>{ convertSize(originalImage.size) }</p>
                         </div>
+
                         <div className="lg:mt-10 mt-4 w-full">
-                            <label htmlFor="uploadImage" className="w-full flex justify-center items-center cursor-pointer bg-orange-500 p-4 rounded-full text-white">Upload Image</label>
+                            <button disabled={ !image || compressedImage } onClick={ saveImage } className="w-full flex justify-center items-center cursor-pointer bg-orange-500 p-4 rounded-full text-white disabled:bg-orange-100 disabled:text-gray-400 shadow">
+                                <p className="text-sm">Compress Image</p>
+                            </button>
                         </div>
                         <button onClick={ handleReset } className='w-full mt-4 text-gray-400 hover:text-gray-500 transform hover:scale-[1.03] transition text-sm focus-visible:outline-none'>Reset</button>
                     </div>
@@ -279,14 +288,16 @@ const Main = () => {
                             { 
                                 (!image && !compressedImageLink) &&
                                 <div className='absolute w-full h-full top-0 left-0 z-10'>
-                                    <label className='w-full h-full cursor-pointer flex flex-col justify-center items-center border border-dashed rounded-xl' htmlFor="uploadImage">
+                                    <div {...getRootProps({className: 'dropzone'})} className='w-full h-full cursor-pointer flex flex-col justify-center items-center border border-dashed rounded-xl'>
+                                        <input {...getInputProps()} />
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-20 h-20 text-gray-400">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                                         </svg>
                                         <p className='font-semibold lg:text-5xl mt-10 text-gray-400'>Upload your Image</p>
                                         <p className='text-xs text-gray-400 mt-4'>Supported file types: JPEG, PNG</p>
-                                    </label>
+                                    </div>
                                 </div>
+                                
                             }
 
                             <div id='image_wrapper' style={{ height: imageSize.height, width: imageSize.width }} className='relative z-0'>
@@ -308,8 +319,6 @@ const Main = () => {
                                 { compressedImageLink && <img src={ compressedImageLink } alt="" className='object-contain shadow bg-white'/>}
                             </div>
                         </div>
-                        
-                        <input onClick={ handleClick } onChange={ handleImage } className='hidden' type="file" id='uploadImage'/>
                     </div>
 
                 </div>
