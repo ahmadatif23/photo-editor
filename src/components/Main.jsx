@@ -7,9 +7,7 @@ const Main = () => {
     const [originalImage, setOriginalImage] = useState('')
     const [compressedImage, setCompressedImage] = useState('')
     const [compressedImageLink, setCompressedImageLink] = useState('')
-    const [watermark, setWatermark] = useState('')
     const [rotate, setRotate] = useState(0)
-    const [isWatermark, setIsWatermark] = useState(false)
     const [container, setContainer] = useState({
         height: 0,
         width: 0
@@ -22,9 +20,6 @@ const Main = () => {
         height: 0,
         width: 0
     })
-
-    // SAVE IMAGE USING CANVAS
-    const [details, setDetails] = useState('')
 
     // SET THE CONTAINER SIZE BEFORE ADDING THE IMAGE
     const handleClick = () => {
@@ -43,7 +38,6 @@ const Main = () => {
 
             reader.onload = () => {
                 setImage(reader.result)
-                setIsWatermark(false)
                 setOriginalImage(e.target.files[0])
                 setCompressedImage('')
                 setCompressedImageLink('')
@@ -141,48 +135,6 @@ const Main = () => {
         }
     }
 
-    const handleCompress = (e) => {
-        e.preventDefault()
-
-        const options = {
-            maxSizeMB: 0.5,
-            maxWidthOrHeight: 1024,
-            useWebWorker: true
-        }
-
-        toBlob(document.getElementById('image_wrapper'))
-            .then(function (blob) {
-                const tempImage = blob
-
-                if (options.maxSizeMB >= tempImage/1024) {
-                    alert('Image is too small, cant be compressed')
-                    return 0
-                }
-        
-                imageCompression(tempImage, options).then((output) => {
-                    const downloadLink = URL.createObjectURL(output)
-
-                    var reader = new FileReader();
-                    reader.readAsDataURL(blob); 
-                    reader.onloadend = function() {
-                        // var base64data = reader.result;                
-                    }
-        
-                    setIsWatermark(false)
-                    setCompressedImage(output)
-                    setCompressedImageLink(downloadLink)
-                })
-            });
-    }
-
-    const showWatermark = () => {
-        setIsWatermark(!isWatermark)
-    }
-
-    const handleWatermark = (e) => {
-        setWatermark(e.currentTarget.value)
-    }
-
     const convertSize = (bytes) => {
         if (!+bytes) return '0 bytes'
     
@@ -198,11 +150,9 @@ const Main = () => {
         if (compressedImage) {
             setCompressedImageLink('')
             setCompressedImage('')
-            setIsWatermark(false)
         } else {
             setCompressedImageLink('')
             setCompressedImage('')
-            setIsWatermark(false)
             setImage('')
             document.getElementById('uploadImage').value = ''
         }
@@ -213,7 +163,7 @@ const Main = () => {
         img.src = image
 
         const options = {
-            maxSizeMB: 0.3,
+            maxSizeMB: 0.5,
             maxWidthOrHeight: 1024,
             useWebWorker: true
         }
@@ -249,16 +199,18 @@ const Main = () => {
                     canvas.width = 1024
                 }
             }
-            console.log(image)
 
             ctx.translate(canvas.width/2, canvas.height/2)
             ctx.rotate(rotate * (Math.PI / 180))
             ctx.drawImage(img, -image.width / 2, -image.height / 2, image.width, image.height)
 
-            // ctx.font = "36px Arial"
-            // ctx.fillStyle = "#FFF"
-            // ctx.textAlign = 'center'
-            // ctx.fillText (`<div>Tsst</div>`, canvas.width/2, canvas.height/2)
+            ctx.font = "600 30px Arial"
+            ctx.fillStyle = "rgba(255, 255, 255, 0.65)"
+            ctx.textAlign = 'center'
+
+            ctx.rotate(-rotate * (Math.PI / 180))
+            ctx.fillText ('CHIN CHUN', 0, 30)
+            ctx.fillText ('0102345678', 0, 70)
 
             canvas.toBlob((blob) => {
                 const tempImage = blob
@@ -272,21 +224,14 @@ const Main = () => {
                     const downloadLink = URL.createObjectURL(output)
 
                     var reader = new FileReader();
-                    reader.readAsDataURL(blob); 
+                    reader.readAsDataURL(output); 
                     reader.onloadend = function() {
-                        // var base64data = reader.result;                
+                        var base64result = reader.result;    
+                        setCompressedImageLink(base64result)
                     }
-        
-                    setIsWatermark(false)
                     setCompressedImage(output)
-                    setCompressedImageLink(downloadLink)
                 })
             })
-
-            // const a = document.createElement('a')
-            // a.download = 'download.png'
-            // a.href = canvas.toDataURL('image/png')
-            // a.click()
         }
     }
 
@@ -304,19 +249,7 @@ const Main = () => {
                             </button>
                         </div>
 
-                        <div className='flex flex-col gap-1'>
-                            <button disabled={ !image } onClick={ showWatermark } className="border rounded-xl px-6 py-4 flex bg-white disabled:bg-gray-50 flex-col shadow">
-                                <p className="text-sm text-gray-600">Add Watermark</p>
-                            </button>
-                            {
-                                isWatermark &&
-                                <div className='border rounded-xl px-6 py-4 flex bg-white disabled:bg-gray-50 shadow'>
-                                    <input autoFocus onInput={ handleWatermark } type="text" value={watermark} placeholder='Please type your watermark' className='placeholder:text-xs border-b focus-within:outline-none text-sm text-gray-600 p-0.5 w-full'/>
-                                </div>
-                            }
-                        </div>
-
-                        <button disabled={ !image || compressedImage } onClick={ handleCompress } className="border rounded-xl px-6 py-4 flex bg-white disabled:bg-gray-50 shadow">
+                        <button disabled={ !image || compressedImage } onClick={ saveImage } className="border rounded-xl px-6 py-4 flex bg-white disabled:bg-gray-50 shadow">
                             <p className="text-sm text-gray-600">Compress Image</p>
                         </button>
                     </div>
@@ -334,7 +267,6 @@ const Main = () => {
                             <label htmlFor="uploadImage" className="w-full flex justify-center items-center cursor-pointer bg-orange-500 p-4 rounded-full text-white">Upload Image</label>
                         </div>
                         <button onClick={ handleReset } className='w-full mt-4 text-gray-400 hover:text-gray-500 transform hover:scale-[1.03] transition text-sm focus-visible:outline-none'>Reset</button>
-                        <button onClick={ saveImage } className='w-full mt-4 text-red-500 hover:text-red-600 transform hover:scale-[1.03] transition text-sm focus-visible:outline-none'>Save</button>
                     </div>
                 </div>
             </div>
@@ -369,20 +301,11 @@ const Main = () => {
                                             src={ image }
                                             alt='Uploaded'
                                             className='object-contain shadow bg-white'
-                                            onLoad={e => console.log(e.target.value)}
                                         />
                                     </div>
                                 }
 
                                 { compressedImageLink && <img src={ compressedImageLink } alt="" className='object-contain shadow bg-white'/>}
-
-                                { (watermark && isWatermark) && <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-10'>
-                                    <div className='flex flex-col items-center justify-center p-2'>
-                                        <div className='text-white font-bold uppercase text-xl opacity-60 tracking-widest'>WONG WEI</div>
-                                        <div className='text-white font-bold uppercase text-xl opacity-60 tracking-widest'>0102233445</div>
-                                        <div className='text-white font-bold uppercase text-xl opacity-60 tracking-widest'>NEXTSIX</div>
-                                    </div>
-                                </div> }
                             </div>
                         </div>
                         
