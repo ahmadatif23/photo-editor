@@ -22,6 +22,8 @@ const Main = () => {
         width: 0
     })
 
+    const [loading, setLoading] = useState(false)
+
     // SET THE CONTAINER SIZE BEFORE ADDING THE IMAGE
     const handleClick = () => {
         const imageContainer = document.getElementById('image_container')
@@ -37,6 +39,7 @@ const Main = () => {
         onDrop: files => {
             console.log('start')
             console.log('loading...')
+            setLoading(true)
             const imageContainer = document.getElementById('image_container')
             if (imageContainer) {
                 setContainer({
@@ -57,6 +60,7 @@ const Main = () => {
                 const img = new Image()
                 img.src = reader.result
                 img.onload = () => {
+                    setLoading(false)
                     console.log('completed')
                     if (img.width >= img.height) {
                         setMaxSize({
@@ -169,6 +173,7 @@ const Main = () => {
     }
 
     const saveImage = () => {
+        setLoading(true)
         const img = new Image()
         img.src = image
 
@@ -240,6 +245,7 @@ const Main = () => {
                         setCompressedImageLink(base64result)
                     }
                     setCompressedImage(output)
+                    setLoading(false)
                 })
             })
         }
@@ -251,10 +257,10 @@ const Main = () => {
                 <div className="lg:w-4/5 h-full flex flex-col">
                     <div className="flex flex-col gap-4">
                         <div className='flex w-full gap-4'>
-                            <button disabled={ !image } onClick={ (e) => handleRotate(e, 'left') } className="border w-full flex items-center justify-center rounded-xl px-6 py-4 bg-white disabled:bg-gray-50 shadow">
+                            <button disabled={ !image || compressedImage } onClick={ (e) => handleRotate(e, 'left') } className="border w-full flex items-center justify-center rounded-xl px-6 py-4 bg-white disabled:bg-gray-50 shadow hover:scale-[1.02] disabled:hover:scale-100 hover:bg-gray-100 transition">
                                 <p className="text-sm text-gray-600">Rotate Left </p>
                             </button>
-                            <button disabled={ !image } onClick={ (e) => handleRotate(e, 'right') } className="border w-full flex items-center justify-center rounded-xl px-6 py-4 bg-white disabled:bg-gray-50 shadow">
+                            <button disabled={ !image || compressedImage } onClick={ (e) => handleRotate(e, 'right') } className="border w-full flex items-center justify-center rounded-xl px-6 py-4 bg-white disabled:bg-gray-50 shadow hover:scale-[1.02] disabled:hover:scale-100 hover:bg-gray-100 transition">
                                 <p className="text-sm text-gray-600">Rotate Right</p>
                             </button>
                         </div>
@@ -271,7 +277,7 @@ const Main = () => {
                         </div>
 
                         <div className="lg:mt-10 mt-4 w-full">
-                            <button disabled={ !image || compressedImage } onClick={ saveImage } className="w-full flex justify-center items-center cursor-pointer bg-orange-500 p-4 rounded-full text-white disabled:bg-orange-100 disabled:text-gray-400 shadow">
+                            <button disabled={ !image || compressedImage } onClick={ saveImage } className="w-full flex justify-center items-center bg-orange-500 p-4 rounded-full text-white disabled:bg-orange-100 disabled:text-gray-400 shadow hover:scale-[1.02] disabled:hover:scale-100 hover:bg-orange-600 transition">
                                 <p className="text-sm">Compress Image</p>
                             </button>
                         </div>
@@ -286,7 +292,7 @@ const Main = () => {
                     <div className='w-full h-full relative z-10'>
                         <div id='image_container' className='w-full h-full flex items-center justify-center relative'>
                             { 
-                                (!image && !compressedImageLink) &&
+                                (!image && !compressedImageLink && !loading) &&
                                 <div className='absolute w-full h-full top-0 left-0 z-10'>
                                     <div {...getRootProps({className: 'dropzone'})} className='w-full h-full cursor-pointer flex flex-col justify-center items-center border border-dashed rounded-xl'>
                                         <input {...getInputProps()} />
@@ -299,6 +305,8 @@ const Main = () => {
                                 </div>
                                 
                             }
+
+                            { loading && <div className='absolute z-10 w-full h-full bg-black bg-opacity-40 rounded-xl flex items-center justify-center text-center text-2xl text-gray-50 font-semibold'>Loading...</div> }
 
                             <div id='image_wrapper' style={{ height: imageSize.height, width: imageSize.width }} className='relative z-0'>
                                 { (image && !compressedImageLink) &&
