@@ -5,6 +5,13 @@ import { useDropzone } from 'react-dropzone'
 import logoNextsix from '../images/logo.svg'
 
 const Main = () => {
+    const [images, setImages] = useState([])
+    const [originalImages, setOriginalImages] = useState([])
+    const [rotateArray, setRotateArray] = useState([])
+    const [maxSizeArray, setMaxSizeArray] = useState([])
+    const [imageSizeArray, setImageSizeArray] = useState([])
+    const [curIndex, setCurIndex] = useState(0)
+
     const [image, setImage] = useState('')
     const [originalImage, setOriginalImage] = useState('')
     const [compressedImage, setCompressedImage] = useState('')
@@ -48,6 +55,45 @@ const Main = () => {
                     width: imageContainer.clientWidth
                 })
             }
+
+            files.forEach(file => {
+                const reader = new FileReader()
+                reader.onload = () => {
+                    setImages(prevImages => [...prevImages, reader.result])
+                    // setOriginalImage(prevOriginalImages => [...prevOriginalImages, file])
+                    setRotateArray(prevRotateArray => [...prevRotateArray, 0])
+
+                    // SET IMAGE SIZE
+                    const img = new Image()
+                    img.src = reader.result
+                    img.onload = () => {
+                        setLoading(false)
+                        if (img.width >= img.height) {
+                            setMaxSizeArray(prevMaxSizeArray => [...prevMaxSizeArray, {
+                                height: `${ (img.height / img.width) * imageContainer.clientWidth }px`,
+                                width: `${ imageContainer.clientWidth }px`
+                            }])
+
+                            setImageSizeArray(prevImageSizeArray => [...prevImageSizeArray, {
+                                height: `${ (img.height / img.width) * imageContainer.clientWidth }px`,
+                                width: `${ imageContainer.clientWidth }px`
+                            }])
+                        } else {
+                            setMaxSizeArray(prevMaxSizeArray => [...prevMaxSizeArray, {
+                                height: `${ imageContainer.clientHeight }px`,
+                                width: `${ imageContainer.clientHeight / (img.height / img.width) }px`
+                            }])
+
+                            setImageSizeArray(prevImageSizeArray => [...prevImageSizeArray, {
+                                height: `${ imageContainer.clientHeight }px`,
+                                width: `${ imageContainer.clientHeight / (img.height / img.width) }px`
+                            }])
+                        }
+                    }
+                }
+                reader.readAsDataURL(file)
+            })
+
             const reader = new FileReader()
 
             reader.onload = () => {
@@ -175,6 +221,7 @@ const Main = () => {
 
     const saveImage = () => {
         setLoading(true)
+
         const img = new Image()
         const lgNsx = new Image()
         img.src = image
@@ -270,6 +317,21 @@ const Main = () => {
                         </div>
                     </div>
 
+                    <div className='h-28 w-full bg-blue-50 p-1 mt-10 overflow-hidden flex'>
+                        <div className='overflow-auto flex w-full gap-1'>
+                            { images.map((tstImg, index) => (
+                                <div className='h-28 w-28 bg-red-50 flex-shrink-0 overflow-hidden'>
+                                    <img
+                                        src={ tstImg }
+                                        alt='Uploaded'
+                                        className=' object-cover h-full w-full'
+                                        onClick={() => setCurIndex(index)}
+                                    />
+                                </div>
+                            )) }
+                        </div>
+                    </div>
+
                     <div className="mt-auto w-full">
                         <div className={ 'justify-between items-center ' + (!compressedImage ? 'hidden' : 'flex') }>
                             <p className="text-xs text-gray-400">Optimised Image Size</p>
@@ -312,7 +374,26 @@ const Main = () => {
 
                             { loading && <div className='absolute z-10 w-full h-full bg-black bg-opacity-40 rounded-xl flex items-center justify-center text-center text-2xl text-gray-50 font-semibold'>Loading...</div> }
 
-                            <div id='image_wrapper' style={{ height: imageSize.height, width: imageSize.width }} className='relative z-0'>
+                            <div id='image_wrapper' style={{ height: (imageSizeArray[curIndex] ? imageSizeArray[curIndex].height : 0), width: (imageSizeArray[curIndex] ? imageSizeArray[curIndex].width : 0) }} className='relative z-0'>
+                                { (image && !compressedImageLink) &&
+                                    <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>
+                                        <img
+                                            style={{
+                                                transform: `rotate(${ rotate }deg)`,
+                                                maxHeight: maxSizeArray[curIndex] ? maxSizeArray[curIndex].height : 0,
+                                                maxWidth: maxSizeArray[curIndex] ? maxSizeArray[curIndex].width : 0
+                                            }}
+                                            src={ images[curIndex] }
+                                            alt='Uploaded'
+                                            className='object-contain shadow bg-white'
+                                        />
+                                    </div>
+                                }
+
+                                { compressedImageLink && <img src={ compressedImageLink } alt="" className='object-contain shadow bg-white'/>}
+                            </div>
+
+                            {/* <div id='image_wrapper' style={{ height: imageSize.height, width: imageSize.width }} className='relative z-0'>
                                 { (image && !compressedImageLink) &&
                                     <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>
                                         <img
@@ -329,7 +410,7 @@ const Main = () => {
                                 }
 
                                 { compressedImageLink && <img src={ compressedImageLink } alt="" className='object-contain shadow bg-white'/>}
-                            </div>
+                            </div> */}
                         </div>
                     </div>
 
