@@ -2,6 +2,7 @@ import { useState } from 'react'
 import imageCompression from 'browser-image-compression'
 import { toBlob } from 'html-to-image';
 import { useDropzone } from 'react-dropzone'
+import logoNextsix from '../images/logo.svg'
 
 const Main = () => {
     const [image, setImage] = useState('')
@@ -175,7 +176,9 @@ const Main = () => {
     const saveImage = () => {
         setLoading(true)
         const img = new Image()
+        const lgNsx = new Image()
         img.src = image
+        lgNsx.src = logoNextsix
 
         const options = {
             maxSizeMB: 0.5,
@@ -183,7 +186,7 @@ const Main = () => {
             useWebWorker: true
         }
 
-        img.onload = (e) => {
+        lgNsx.onload = (e) => {
             const canvas = document.createElement('canvas')
             const ctx = canvas.getContext('2d')
             const image = {
@@ -218,14 +221,15 @@ const Main = () => {
             ctx.translate(canvas.width/2, canvas.height/2)
             ctx.rotate(rotate * (Math.PI / 180))
             ctx.drawImage(img, -image.width / 2, -image.height / 2, image.width, image.height)
+            ctx.drawImage(lgNsx, -80, 30, 160, ((lgNsx.height / lgNsx.width) * 160))
             
             ctx.font = "600 30px Arial"
             ctx.fillStyle = "rgba(255, 255, 255, 0.65)"
             ctx.textAlign = 'center'
 
             ctx.rotate(-rotate * (Math.PI / 180))
-            ctx.fillText ('JASON FORD', 0, 30)
-            ctx.fillText ('0102345678', 0, 70)
+            ctx.fillText ('JASON FORD', 0, 105)
+            ctx.fillText ('0102345678', 0, 140)
 
             canvas.toBlob((blob) => {
                 const tempImage = blob
