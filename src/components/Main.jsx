@@ -139,8 +139,20 @@ const Main = () => {
         e.preventDefault()
 
         if (direction === 'right') {
+            let items = [...rotateArray];
+            let item = {...rotateArray[curIndex]};
+            item = rotateArray[curIndex] + 90;
+            items[curIndex] = item;
+            setRotateArray(items);
+
             setRotate(rotate + 90)
         } else if (direction === 'left') {
+            let items = [...rotateArray];
+            let item = {...rotateArray[curIndex]};
+            item = rotateArray[curIndex] - 90;
+            items[curIndex] = item;
+            setRotateArray(items);
+
             setRotate(rotate - 90)
         }
 
@@ -379,7 +391,7 @@ const Main = () => {
                                     <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>
                                         <img
                                             style={{
-                                                transform: `rotate(${ rotate }deg)`,
+                                                transform: `rotate(${ rotateArray[curIndex] ? rotateArray[curIndex] : 0 }deg)`,
                                                 maxHeight: maxSizeArray[curIndex] ? maxSizeArray[curIndex].height : 0,
                                                 maxWidth: maxSizeArray[curIndex] ? maxSizeArray[curIndex].width : 0
                                             }}
