@@ -155,12 +155,22 @@ const Main = () => {
 
         // SET IMAGE SIZE
         const img = new Image()
-        img.src = image
+        img.src = images[curIndex]
 
         // CHECK IMAGE ORIENTATION
+        let itemMaxSizes = [...maxSizeArray];
+        let itemMaxSize = {...maxSizeArray[curIndex]};
+        let itemImageSizes = [...imageSizeArray];
+        let itemImageSize = {...imageSizeArray[curIndex]};
         if (img.width >= img.height) {
-            if ((rotate / 90) % 2 === 0) {
+            if ((rotateArray[curIndex] / 90) % 2 === 0) {
                 // POTRAIT ORIENTATION
+                itemMaxSize.height = `${ container.height / (img.width / img.height) }px`
+                itemMaxSize.width = container.height
+
+                itemImageSize.height = container.height
+                itemImageSize.width = `${ container.height / (img.width / img.height) }px`
+                
                 setMaxSize({
                     height: `${ container.height / (img.width / img.height) }px`,
                     width: container.height
@@ -171,6 +181,12 @@ const Main = () => {
                 })
             } else {
                 // LANDSCAPE ORIENTATION
+                itemMaxSize.height = `${ (img.height / img.width) * container.width }px`
+                itemMaxSize.width = `${ container.width }px`
+
+                itemImageSize.height = `${ (img.height / img.width) * container.width }px`
+                itemImageSize.width = `${ container.width }px`
+
                 setMaxSize({
                     height: `${ (img.height / img.width) * container.width }px`,
                     width: `${ container.width }px`
@@ -181,8 +197,14 @@ const Main = () => {
                 })
             }
         } else {
-            if ((rotate / 90) % 2 === 0) {
+            if ((rotateArray[curIndex] / 90) % 2 === 0) {
                 // LANDSCAPE ORIENTATION
+                itemMaxSize.width = `${ (img.height / img.width) * container.width }px`
+                itemMaxSize.height = `${ container.width }px`
+
+                itemImageSize.height = `${ (img.width / img.height) * container.width }px`
+                itemImageSize.width = `${ container.width }px`
+
                 setMaxSize({
                     height: `${ container.width }px`,
                     width: `${ (img.height / img.width) * container.width }px`
@@ -193,9 +215,15 @@ const Main = () => {
                 })
             } else {
                 // POTRAIT ORIENTATION
+                itemMaxSize.height = `${  container.height }px`
+                itemMaxSize.width = `${ (img.width / img.height) * container.width }px`
+
+                itemImageSize.height = `${ (container.height) }px`
+                itemImageSize.width = `${ container.width }px`
+
                 setMaxSize({
                     height: `${  container.height }px`,
-                    width: `${ (img.width / img.height) * container.width }px`
+                    width: `${ container.height / (img.height / img.width) }px`
                 })
                 setImageSize({
                     height: `${ container.height }px`,
@@ -203,6 +231,10 @@ const Main = () => {
                 })
             }
         }
+        itemMaxSizes[curIndex] = itemMaxSize;
+        setMaxSizeArray(itemMaxSizes);
+        itemImageSizes[curIndex] = itemImageSize;
+        setImageSizeArray(itemImageSizes);
     }
 
     const convertSize = (bytes) => {
