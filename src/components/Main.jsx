@@ -308,8 +308,7 @@ const Main = () => {
                     var reader = new FileReader();
                     reader.readAsDataURL(output); 
                     reader.onloadend = function() {
-                        var base64result = reader.result;    
-                        setCompressedImageLink(base64result)
+                        setCompressedImageLink(reader.result)
                     }
                     setCompressedImage(output)
                     setLoading(false)
@@ -338,7 +337,6 @@ const Main = () => {
                                     <p className="text-sm text-gray-600">{ isWatermark ? 'Remove' : 'Add' } Watermark</p>
                                 </div>
                             </label>
-                            {/* <button onClick={ showWatermark }>Show watermark</button> */}
                         </div>
                     </div>
 
@@ -354,7 +352,7 @@ const Main = () => {
 
                         <div className="lg:mt-10 mt-4 w-full">
                             <button disabled={ !image || compressedImage } onClick={ saveImage } className="w-full flex justify-center items-center bg-orange-500 p-4 rounded-full text-white disabled:bg-orange-100 disabled:text-gray-400 shadow hover:scale-[1.02] disabled:hover:scale-100 hover:bg-orange-600 transition">
-                                <p className="text-sm">Upload</p>
+                                <p className="text-sm">Submit</p>
                             </button>
                         </div>
                         <button onClick={ handleReset } className='w-full mt-4 text-gray-400 hover:text-gray-500 transform hover:scale-[1.03] transition text-sm focus-visible:outline-none'>Reset</button>
