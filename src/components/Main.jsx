@@ -223,7 +223,7 @@ const Main = () => {
             ctx.drawImage(img, -image.width / 2, -image.height / 2, image.width, image.height)
             ctx.drawImage(lgNsx, -80, 30, 160, ((lgNsx.height / lgNsx.width) * 160))
             
-            ctx.font = "600 30px Arial"
+            ctx.font = "500 28px Arial"
             ctx.fillStyle = "rgba(255, 255, 255, 0.65)"
             ctx.textAlign = 'center'
 
