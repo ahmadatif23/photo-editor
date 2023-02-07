@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import imageCompression from 'browser-image-compression'
-import { toBlob } from 'html-to-image';
 import { useDropzone } from 'react-dropzone'
 import logoNextsix from '../images/logo.svg'
 
@@ -23,23 +22,11 @@ const Main = () => {
         width: 0
     })
 
+    const [isWatermark, setIsWatermark] = useState(false)
     const [loading, setLoading] = useState(false)
 
-    // SET THE CONTAINER SIZE BEFORE ADDING THE IMAGE
-    const handleClick = () => {
-        const imageContainer = document.getElementById('image_container')
-        if (imageContainer) {
-            setContainer({
-                height: imageContainer.clientHeight,
-                width: imageContainer.clientWidth
-            })
-        }
-    }
-
-    const {acceptedFiles, getRootProps, getInputProps} = useDropzone({
+    const { getRootProps, getInputProps } = useDropzone({
         onDrop: files => {
-            console.log('start')
-            console.log('loading...')
             setLoading(true)
             const imageContainer = document.getElementById('image_container')
             if (imageContainer) {
@@ -62,7 +49,6 @@ const Main = () => {
                 img.src = reader.result
                 img.onload = () => {
                     setLoading(false)
-                    console.log('completed')
                     if (img.width >= img.height) {
                         setMaxSize({
                             height: `${ (img.height / img.width) * imageContainer.clientWidth }px`,
@@ -91,11 +77,14 @@ const Main = () => {
   
     const handleRotate = (e, direction) => {
         e.preventDefault()
+        let currentRotation = 0
 
         if (direction === 'right') {
             setRotate(rotate + 90)
+            currentRotation = (rotate + 90)
         } else if (direction === 'left') {
             setRotate(rotate - 90)
+            currentRotation = (rotate - 90)
         }
 
         // SET IMAGE SIZE
@@ -148,6 +137,8 @@ const Main = () => {
                 })
             }
         }
+
+        if (isWatermark) handleWatermark(currentRotation)
     }
 
     const convertSize = (bytes) => {
@@ -162,14 +153,84 @@ const Main = () => {
     }
 
     const handleReset = () => {
-        if (compressedImage) {
-            setCompressedImageLink('')
-            setCompressedImage('')
-        } else {
-            setCompressedImageLink('')
-            setCompressedImage('')
+        if (!compressedImage) {
             setImage('')
-            document.getElementById('uploadImage').value = ''
+        }
+
+        setCompressedImageLink('')
+        setCompressedImage('')
+        setIsWatermark(false)
+        document.getElementById('showWatermarkInput').checked = false
+    }
+
+    const showWatermark = (e) => {
+        let currIsWatermark
+
+        if (e.target.checked) {
+            setIsWatermark(true)
+            currIsWatermark = true
+        } else {
+            setIsWatermark(false)
+            currIsWatermark = false
+        }
+
+        if (currIsWatermark) {
+            handleWatermark(rotate)
+        }
+    }
+
+    const handleWatermark = (currentRotation) => {
+        
+        const img = new Image()
+        const lgNsx = new Image()
+        img.src = image
+        lgNsx.src = logoNextsix
+
+        lgNsx.onload = (e) => {
+            const canvas = document.getElementById("canvas")
+            
+            const ctx = canvas.getContext('2d')
+            const image = {
+                height: 0,
+                width: 0
+            }
+
+            if (img.width >= img.height) {
+                image.width = 1024
+                image.height = (img.height / img.width) * 1024
+
+                if ((currentRotation / 90) % 2 === 0) {
+                    canvas.width = 1024
+                    canvas.height = (img.height / img.width) * 1024
+                } else {
+                    canvas.width = (img.height / img.width) * 1024
+                    canvas.height = 1024
+                }
+            } else {
+                image.height = 1024
+                image.width = 1024 / (img.height / img.width)
+
+                if ((currentRotation / 90) % 2 === 0) {
+                    canvas.height = 1024
+                    canvas.width = 1024 / (img.height / img.width)
+                } else {
+                    canvas.height = 1024 / (img.height / img.width)
+                    canvas.width = 1024
+                }
+            }
+
+            ctx.translate(canvas.width/2, canvas.height/2)
+            ctx.rotate(currentRotation * (Math.PI / 180))
+            ctx.drawImage(img, -image.width / 2, -image.height / 2, image.width, image.height)
+            
+            ctx.font = "500 26px Arial"
+            ctx.fillStyle = "rgba(255, 255, 255, 0.65)"
+            ctx.textAlign = 'center'
+
+            ctx.rotate(-currentRotation * (Math.PI / 180))
+            ctx.drawImage(lgNsx, -80, 30, 160, ((lgNsx.height / lgNsx.width) * 160))
+            ctx.fillText ('JASON FORD', 0, 105)
+            ctx.fillText ('0102345678', 0, 140)
         }
     }
 
@@ -222,14 +283,16 @@ const Main = () => {
             ctx.rotate(rotate * (Math.PI / 180))
             ctx.drawImage(img, -image.width / 2, -image.height / 2, image.width, image.height)
             
-            ctx.font = "500 28px Arial"
+            ctx.font = "500 26px Arial"
             ctx.fillStyle = "rgba(255, 255, 255, 0.65)"
             ctx.textAlign = 'center'
 
-            ctx.rotate(-rotate * (Math.PI / 180))
-            ctx.drawImage(lgNsx, -80, 30, 160, ((lgNsx.height / lgNsx.width) * 160))
-            ctx.fillText ('JASON FORD', 0, 105)
-            ctx.fillText ('0102345678', 0, 140)
+            if (isWatermark) {
+                ctx.rotate(-rotate * (Math.PI / 180))
+                ctx.drawImage(lgNsx, -80, 30, 160, ((lgNsx.height / lgNsx.width) * 160))
+                ctx.fillText ('JASON FORD', 0, 105)
+                ctx.fillText ('0102345678', 0, 140)
+            }
 
             canvas.toBlob((blob) => {
                 const tempImage = blob
@@ -240,7 +303,7 @@ const Main = () => {
                 }
         
                 imageCompression(tempImage, options).then((output) => {
-                    const downloadLink = URL.createObjectURL(output)
+                    // const downloadLink = URL.createObjectURL(output)
 
                     var reader = new FileReader();
                     reader.readAsDataURL(output); 
@@ -268,6 +331,15 @@ const Main = () => {
                                 <p className="text-sm text-gray-600">Rotate Right</p>
                             </button>
                         </div>
+                        <div>
+                            <label>
+                                <input onChange={ showWatermark } disabled={ !image || compressedImage } className='peer hidden' type="checkbox" id='showWatermarkInput'/>
+                                <div className='border w-full flex items-center justify-center rounded-xl px-6 py-4 bg-white peer-checked:bg-orange-100 peer-disabled:bg-gray-50 peer-disabled:cursor-default cursor-pointer shadow hover:scale-[1.02] peer-disabled:hover:scale-100 hover:bg-gray-100 transition'>
+                                    <p className="text-sm text-gray-600">{ isWatermark ? 'Remove' : 'Add' } Watermark</p>
+                                </div>
+                            </label>
+                            {/* <button onClick={ showWatermark }>Show watermark</button> */}
+                        </div>
                     </div>
 
                     <div className="mt-auto w-full">
@@ -282,7 +354,7 @@ const Main = () => {
 
                         <div className="lg:mt-10 mt-4 w-full">
                             <button disabled={ !image || compressedImage } onClick={ saveImage } className="w-full flex justify-center items-center bg-orange-500 p-4 rounded-full text-white disabled:bg-orange-100 disabled:text-gray-400 shadow hover:scale-[1.02] disabled:hover:scale-100 hover:bg-orange-600 transition">
-                                <p className="text-sm">Compress Image</p>
+                                <p className="text-sm">Upload</p>
                             </button>
                         </div>
                         <button onClick={ handleReset } className='w-full mt-4 text-gray-400 hover:text-gray-500 transform hover:scale-[1.03] transition text-sm focus-visible:outline-none'>Reset</button>
@@ -315,16 +387,20 @@ const Main = () => {
                             <div id='image_wrapper' style={{ height: imageSize.height, width: imageSize.width }} className='relative z-0'>
                                 { (image && !compressedImageLink) &&
                                     <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>
-                                        <img
-                                            style={{
-                                                transform: `rotate(${ rotate }deg)`,
-                                                maxHeight: maxSize.height,
-                                                maxWidth: maxSize.width
-                                            }}
-                                            src={ image }
-                                            alt='Uploaded'
-                                            className='object-contain shadow bg-white'
-                                        />
+                                        {   !isWatermark &&
+                                            <img
+                                                style={{
+                                                    transform: `rotate(${ rotate }deg)`,
+                                                    maxHeight: maxSize.height,
+                                                    maxWidth: maxSize.width
+                                                }}
+                                                src={ image }
+                                                alt='Uploaded'
+                                                className='object-contain shadow bg-white'
+                                            /> 
+                                        }
+                                        
+                                        { isWatermark && <canvas id="canvas" style={{ maxHeight: container.height, maxWidth: container.width }}></canvas> }
                                     </div>
                                 }
 
