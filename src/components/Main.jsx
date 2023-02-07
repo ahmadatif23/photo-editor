@@ -138,23 +138,20 @@ const Main = () => {
     const handleRotate = (e, direction) => {
         e.preventDefault()
 
+        // SET ROTATION ARRAY
+        let itemRotates = [...rotateArray]
+        let itemRotate = {...rotateArray[curIndex]}
         if (direction === 'right') {
-            let items = [...rotateArray];
-            let item = {...rotateArray[curIndex]};
-            item = rotateArray[curIndex] + 90;
-            items[curIndex] = item;
-            setRotateArray(items);
+            itemRotate = rotateArray[curIndex] + 90
 
             setRotate(rotate + 90)
         } else if (direction === 'left') {
-            let items = [...rotateArray];
-            let item = {...rotateArray[curIndex]};
-            item = rotateArray[curIndex] - 90;
-            items[curIndex] = item;
-            setRotateArray(items);
+            itemRotate = rotateArray[curIndex] - 90
 
             setRotate(rotate - 90)
         }
+        itemRotates[curIndex] = itemRotate
+        setRotateArray(itemRotates)
 
         // SET IMAGE SIZE
         const img = new Image()
